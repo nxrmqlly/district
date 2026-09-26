@@ -2,29 +2,29 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/nxrmqlly/district/api"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	fmt.Println("hello world")
 
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "text/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("{\"bl\": \"hello, world\"}"))
-	})
-
 	srv := http.Server{
-		Addr:    ":2468",
-		Handler: mux,
+		Addr:    os.Getenv("BIND_ADDR"),
+		Handler: api.New(),
 	}
 
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 }
