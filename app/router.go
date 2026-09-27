@@ -1,18 +1,33 @@
 package app
 
-import "net/http"
+import (
+	"net/http"
+	"html/template"
 
+	"github.com/nxrmqlly/district/store"
+)
+
+// Router is a http.Handler like object that handles routes and templates
 type Router struct {
-	mux *http.ServeMux
+	mux       *http.ServeMux
+	queries   *store.Queries
+	templates *template.Template
 }
 
-func New() *Router {
+func NewRouter(queries *store.Queries) (*Router, error) {
+	tmpl, err := parseTemplates()
+	if err != nil {
+		return nil, err
+	}
+
 	ro := Router{
-		mux: http.NewServeMux(),
+		mux:       http.NewServeMux(),
+		queries:   queries,
+		templates: tmpl,
 	}
 	ro.routes()
 
-	return &ro
+	return &ro, nil
 }
 
 func (ro *Router) routes() {
