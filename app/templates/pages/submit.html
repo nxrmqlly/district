@@ -1,0 +1,93 @@
+{{ define "submit" }}
+
+<main class="submit-main">
+    <form method="post" class="submit-post">
+        <h2 class="make-post-title">new post</h2>
+        {{ if .Data.Error }}
+        <p class="form-error">{{ .Data.Error }}</p>
+        {{ end }}
+        <span id="title-parent">
+            <label for="title">title</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="The metric system sucks"
+                minlength="1"
+                value="{{ .Data.Title }}"
+                required
+            />
+        </span>
+        <textarea
+            id="body"
+            class="body-textarea"
+            name="body"
+            type="textarea"
+            placeholder="Use bananas for scale."
+            required
+        >
+            {{- .Data.Body -}}
+        </textarea>
+        <button class="submit-btn" type="submit">post</button>
+    </form>
+</main>
+
+<style>
+    .form-error {
+        color: var(--error);
+    }
+    .submit-main {
+        background-color: var(--bg);
+        margin-bottom: 2rem;
+    }
+
+    .submit-post {
+        display: flex;
+        flex-direction: column;
+        margin-top: 1em;
+        width: 100%;
+        gap: 1rem;
+
+        & > * {
+            width: 100%;
+        }
+
+        & > textarea {
+            resize: vertical;
+            min-height: 400px;
+        }
+
+        & > button:hover {
+            background-color: var(--surface-raised);
+            cursor: pointer;
+        }
+    }
+
+    .make-post-title {
+        font-weight: 400;
+        font-family: var(--font);
+    }
+
+    #title-parent {
+        display: flex;
+        padding: 0;
+
+        input {
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+        }
+
+        label {
+            padding: 0.4rem 1rem;
+            border-right: solid 1px var(--border);
+            font-size: 24px;
+            color: var(--text-muted);
+            margin: 0;
+            background-color: var(--surface-sunken);
+            border-bottom: 1px solid var(--border);
+        }
+    }
+</style>
+
+{{ end }}

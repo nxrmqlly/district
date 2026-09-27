@@ -2,6 +2,7 @@
     --bg: #fbf1c7;
     --surface: #ebdbb2;
     --surface-raised: #d5c4a1;
+    --surface-sunken: #f2e5bc;
 
     --text: #282828;
     --text-muted: #665c54;
@@ -27,6 +28,7 @@
     --bg: #0f1419;
     --surface: #14191f;
     --surface-raised: #253340;
+    --surface-sunken: #151a1e;
 
     --text: #e6e1cf;
     --text-muted: #5c6773;
@@ -51,14 +53,15 @@
 [data-theme="kanagawa-lotus"] {
     /* Kanagawa Lotus */
     --bg: #f2ecbc;
-    --surface: #dcd5ac;
+    --surface: #e5ddb0;
     --surface-raised: #d5cea3;
+    --surface-sunken: #dcd5ac;
 
     --text: #545464;
     --text-muted: #43436c;
     --text-subtle: #8a8980;
 
-    --border: #c9cbd1;
+    --border: #716e61;
 
     --primary: #4d699b;
     --primary-hover: #6693bf;

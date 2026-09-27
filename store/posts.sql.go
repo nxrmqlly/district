@@ -32,7 +32,7 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 
 const getPostsByUsername = `-- name: GetPostsByUsername :many
 SELECT p.id, p.author_id, p.title, p.embed_url, p.body, p.created_at, u.username as author_username
-FROM posts p 
+FROM posts p
 JOIN users u ON u.id = p.author_id
 WHERE lower(u.username) = lower($1::text)
 ORDER BY p.created_at DESC
@@ -78,17 +78,16 @@ func (q *Queries) GetPostsByUsername(ctx context.Context, username string) ([]Ge
 
 const newPost = `-- name: NewPost :one
 INSERT INTO posts
-(author_id, title, embed_url, body, created_at)
-VALUES ($1, $2, $3, $4, $5)
+(author_id, title, embed_url, body)
+VALUES ($1, $2, $3, $4)
 RETURNING id, author_id, title, embed_url, body, created_at
 `
 
 type NewPostParams struct {
-	AuthorID  uuid.UUID
-	Title     string
-	EmbedUrl  string
-	Body      string
-	CreatedAt time.Time
+	AuthorID uuid.UUID
+	Title    string
+	EmbedUrl string
+	Body     string
 }
 
 func (q *Queries) NewPost(ctx context.Context, arg NewPostParams) (Post, error) {
@@ -97,7 +96,6 @@ func (q *Queries) NewPost(ctx context.Context, arg NewPostParams) (Post, error) 
 		arg.Title,
 		arg.EmbedUrl,
 		arg.Body,
-		arg.CreatedAt,
 	)
 	var i Post
 	err := row.Scan(

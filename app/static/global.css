@@ -4,8 +4,13 @@
     --font-display: serif;
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html {
-    width: 100vw;
     padding: 0;
     margin: 0;
 }
@@ -35,4 +40,46 @@ footer {
     color: var(--text-subtle);
     width: 100%;
     text-align: center;
+}
+
+form {
+    & > * {
+        margin: 0;
+    }
+
+    &:focus-within {
+        *:invalid {
+            border-color: var(--error);
+        }
+
+        *:valid:not([type="submit"]) {
+            border-color: var(--success);
+        }
+    }
+}
+
+input,
+textarea,
+button,
+select {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 0;
+    font: var(--font);
+
+    &:disabled {
+        background-color: var(--surface-sunken);
+        border-color: var(--border);
+        color: var(--text-muted);
+    }
+
+    &:focus,
+        &:active {
+            outline: none;
+        }
 }

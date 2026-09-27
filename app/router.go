@@ -50,13 +50,10 @@ func (ro *Router) routes() error {
 	}
 	ro.mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
 
-	ro.Handle("GET /hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hey!!1647311!"))
-	})
-
-	ro.Handle("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
-		ro.RenderPage(w, r, "home", "", nil)
-	})
+	ro.Handle("GET  /{$}", ro.handleHome)
+	ro.Handle("GET  /submit", ro.handleSubmitView)
+	ro.Handle("POST /submit", ro.handleSubmitCreate)
+	ro.Handle("GET  /p/{id}", ro.handlePostGet)
 
 	return nil
 }

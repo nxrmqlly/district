@@ -17,4 +17,4 @@ migrate-down:
     goose postgres {{ PG_CONNSTR }} down -dir ./store/migrations
 
 hanged:
-    pkill district-dev
+    pkill main
