@@ -7,10 +7,10 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ."
+  bin = "./tmp/district-dev"
+  cmd = "go build -o ./tmp/district-dev ."
   delay = 1000
-  entrypoint = ["./tmp/main"]
+  entrypoint = ["./tmp/district-dev"]
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
   exclude_regex = ["_test.go"]
@@ -55,5 +55,5 @@ tmp_dir = "tmp"
   app_start_timeout = 0
 
 [screen]
-  clear_on_rebuild = false
+  clear_on_rebuild = true
   keep_scroll = true

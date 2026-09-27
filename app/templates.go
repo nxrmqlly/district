@@ -1,7 +1,9 @@
 package app
 
 import (
+	"bytes"
 	"embed"
+	"fmt"
 	"html/template"
 	"io/fs"
 	"net/http"
@@ -13,11 +15,35 @@ import (
 //go:embed templates
 var templatesFS embed.FS
 
-//go:embed static
-var staticFS embed.FS
+type PageContext struct {
+	Page  string
+	Title string
+	Site  any
+	Data  any
+}
+
+// for the custom {{ render .X .X }} directive
+func renderDirective(root *template.Template) func(string, any) (template.HTML, error) {
+	return func(name string, data any) (template.HTML, error) {
+		var buf bytes.Buffer
+		tmpl := root.Lookup(name)
+
+		if tmpl == nil {
+			return "", fmt.Errorf("template %q not found", name)
+		}
+		if err := tmpl.Execute(&buf, data); err != nil {
+			return "", err
+		}
+		return template.HTML(buf.String()), nil
+	}
+}
 
 func parseTemplates() (*template.Template, error) {
-	templates := template.New("")
+	root := template.New("")
+
+	root.Funcs(template.FuncMap{
+		"render": renderDirective(root),
+	})
 
 	if err := fs.WalkDir(templatesFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -28,35 +54,22 @@ func parseTemplates() (*template.Template, error) {
 			return nil
 		}
 
-		// skip pages so we can parse them at request time
-		if strings.HasPrefix(path, "templates/pages/") {
-			return nil
-		}
-
-		_, err = templates.ParseFS(templatesFS, path)
+		_, err = root.ParseFS(templatesFS, path)
 		return err
 
 	}); err != nil {
 		return nil, err
 	}
 
-	return templates, nil
+	return root, nil
 }
 
-func (ro *Router) RenderPage(w http.ResponseWriter, r *http.Request, page string, data any) {
-	tmpl, err := ro.templates.Clone()
-	if err != nil {
-		httpx.ErrorJSON(w, http.StatusInternalServerError, "internal server error")
-		return
-	}
-
-	_, err = tmpl.ParseFS(templatesFS, "templates/pages/"+page+".html")
-	if err != nil {
-		httpx.ErrorJSON(w, http.StatusInternalServerError, "internal server error")
-		return
-	}
-
-	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
+func (ro *Router) RenderPage(w http.ResponseWriter, r *http.Request, page, title string, data any) {
+	if err := ro.templates.ExecuteTemplate(w, "layout", PageContext{
+		Data:  data,
+		Page:  page,
+		Title: title,
+	}); err != nil {
 		httpx.ErrorJSON(w, http.StatusInternalServerError, err.Error())
 		return
 	}

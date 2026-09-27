@@ -16,7 +16,7 @@ body {
     padding: 1em;
 
     background-color: var(--bg);
-    max-width: 75%;
+    max-width: 60%;
 
     font-family: var(--font);
     color: var(--text);

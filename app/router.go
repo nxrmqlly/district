@@ -1,6 +1,7 @@
 package app
 
 import (
+	"embed"
 	"html/template"
 	"io/fs"
 	"net/http"
@@ -37,6 +38,9 @@ func NewRouter(queries *store.Queries) (*Router, error) {
 	return &ro, nil
 }
 
+//go:embed static
+var staticFS embed.FS
+
 func (ro *Router) routes() error {
 	ro.GlobalMws = append(ro.GlobalMws, ro.Logging)
 
@@ -46,13 +50,12 @@ func (ro *Router) routes() error {
 	}
 	ro.mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
 
-	ro.mux.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
-		// ro.RenderPage(w, r, "home", nil)
-		w.Write([]byte("hey"))
+	ro.Handle("GET /hello", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hey!!1647311!"))
 	})
 
-	ro.mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		ro.RenderPage(w, r, "home", nil)
+	ro.Handle("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+		ro.RenderPage(w, r, "home", "", nil)
 	})
 
 	return nil
