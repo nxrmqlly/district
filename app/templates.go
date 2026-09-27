@@ -13,6 +13,9 @@ import (
 //go:embed templates
 var templatesFS embed.FS
 
+//go:embed static
+var staticFS embed.FS
+
 func parseTemplates() (*template.Template, error) {
 	templates := template.New("")
 
@@ -54,7 +57,7 @@ func (ro *Router) RenderPage(w http.ResponseWriter, r *http.Request, page string
 	}
 
 	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
-		httpx.ErrorJSON(w, http.StatusInternalServerError, "internal server error")
+		httpx.ErrorJSON(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 }

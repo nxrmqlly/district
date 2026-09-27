@@ -1,0 +1,38 @@
+:root {
+    /* Fonts */
+    --font: sans-serif;
+    --font-display: serif;
+}
+
+html {
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    position: relative;
+    margin: auto;
+    padding: 1em;
+
+    background-color: var(--bg);
+    max-width: 75%;
+
+    font-family: var(--font);
+    color: var(--text);
+}
+
+@media (max-width: 767px) {
+    body {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+}
+
+footer {
+    color: var(--text-subtle);
+    width: 100%;
+    text-align: center;
+}

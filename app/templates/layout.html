@@ -1,17 +1,19 @@
 {{ define "layout" }}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>{{ .Title }}</title>
-</head>
-<body>
-	<main>
-	    {{ template "page" . }}
-	</main>
-</body>
+<!doctype html>
+<html lang="en" data-theme="ayu-dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ .Title }}</title>
+        <link rel="stylesheet" href="/static/global.css" />
+        <link rel="stylesheet" href="/static/themes.builtin.css" />
+    </head>
+    <body>
+        {{ template "header" }}
+        <div class="content">{{ template "page" . }}</div>
+        {{ template "footer" }}
+    </body>
 </html>
 
 {{ end }}

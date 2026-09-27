@@ -1,0 +1,37 @@
+{{ define "header" }}
+
+<header>
+    <h1 class="title">district.</h1>
+    <nav class="top-nav">
+        <div class="links"><a href="/">home</a> | <a href="/new">newest</a></div>
+        <div class="user-details">login</div>
+    </nav>
+</header>
+
+<style>
+    .top-nav {  
+        font-size: 1.2em;
+        background-color: var(--surface);
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .top-nav a {
+        color: var(--text);
+    }
+
+    .top-nav a:visited {
+        color: var(--text);
+    }
+
+    .title {
+        color: var(--text);
+        font-weight: 400;
+        font-size: 2rem;
+        font-family: sans-serif;
+        margin: 0;
+    }
+</style>
+
+{{ end }}

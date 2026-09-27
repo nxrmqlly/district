@@ -1,0 +1,75 @@
+[data-theme="gruvbox-light"] {
+    --bg: #fbf1c7;
+    --surface: #ebdbb2;
+    --surface-raised: #d5c4a1;
+
+    --text: #282828;
+    --text-muted: #665c54;
+    --text-subtle: #7c6f64;
+
+    --border: #bdae93;
+
+    --primary: #076678;
+    --primary-hover: #458588;
+
+    --accent: #8f3f71;
+    --accent-hover: #b16286;
+
+    --success: #79740e;
+
+    --warning: #b57614;
+    --warning-hover: #d79921;
+
+    --error: #9d0006;
+}
+
+[data-theme="ayu-dark"] {
+    --bg: #0f1419;
+    --surface: #14191f;
+    --surface-raised: #253340;
+
+    --text: #e6e1cf;
+    --text-muted: #5c6773;
+    --text-subtle: #3e4b59;
+
+    --border: #2d3640;
+
+    --primary: #36a3d9;
+    --primary-hover: #59c2ff;
+
+    --accent: #ffb454;
+    --accent-hover: #f29718;
+
+    --success: #b8cc52;
+
+    --warning: #e7c547;
+    --warning-hover: #ffb454;
+
+    --error: #ff3333;
+}
+
+[data-theme="kanagawa-lotus"] {
+    /* Kanagawa Lotus */
+    --bg: #f2ecbc;
+    --surface: #dcd5ac;
+    --surface-raised: #d5cea3;
+
+    --text: #545464;
+    --text-muted: #43436c;
+    --text-subtle: #8a8980;
+
+    --border: #c9cbd1;
+
+    --primary: #4d699b;
+    --primary-hover: #6693bf;
+
+    --accent: #624c83;
+    --accent-hover: #b35b79;
+
+    --success: #6f894e;
+
+    --warning: #e98a00;
+    --warning-hover: #cc6d00;
+
+    --error: #e82424;
+}
