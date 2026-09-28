@@ -27,7 +27,7 @@ type LoginPageData struct {
 func (ro *Router) handleLoginView(w http.ResponseWriter, r *http.Request) {
 	// already logged in
 	if _, ok := SessionFromContext(r.Context()); ok {
-		http.Redirect(w, r, "/", http.StatusOK)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
@@ -47,15 +47,11 @@ type RegisterPageData struct {
 func (ro *Router) handleRegisterView(w http.ResponseWriter, r *http.Request) {
 	// already logged in
 	if _, ok := SessionFromContext(r.Context()); ok {
-		http.Redirect(w, r, "/", http.StatusOK)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
 	ro.RenderPage(w, r, "register", "register", RegisterPageData{})
-}
-
-func (ro *Router) sendToRegisterErr(email, user, err string) {
-
 }
 
 func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +94,7 @@ func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	// * all validations passed
 
-	_, err := ro.auth.RegisterUser(r.Context(), email, username, password)
+	user, err := ro.auth.RegisterUser(r.Context(), email, username, password)
 	if err != nil {
 		switch {
 		case errors.Is(err, auth.ErrUsernameTaken):
@@ -118,6 +114,21 @@ func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	sessToken, err := ro.auth.CreateSession(r.Context(), user.ID)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "district_session",
+		Value:    sessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // FIXME: secure cookie should be config driven
+		SameSite: http.SameSiteLaxMode,
+	})
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
