@@ -19,6 +19,17 @@ type Post struct {
 	CreatedAt time.Time
 }
 
+type Session struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	TokenHash []byte
+	CsrfHash  []byte
+	CreatedAt time.Time
+	ExpiresAt time.Time
+	LastUsed  *time.Time
+	RevokedAt *time.Time
+}
+
 type User struct {
 	ID         uuid.UUID
 	Username   string

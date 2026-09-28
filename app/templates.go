@@ -16,10 +16,11 @@ import (
 var templatesFS embed.FS
 
 type PageContext struct {
-	Page  string
-	Title string
-	Site  any
-	Data  any
+	Page      string
+	Title     string
+	CSRFToken string
+	Site      any
+	Data      any
 }
 
 // for the custom {{ render .X .X }} directive

@@ -1,7 +1,9 @@
 {{ define "header" }}
 
 <header>
-    <h1 class="header-site-title">district.</h1>
+    <a class="header-site-title" href="/">
+        <h1>district.</h1>
+    </a>
     <nav class="top-nav">
         <div class="links">
             <a href="/">home</a> | <a href="/submit">write</a>
@@ -33,11 +35,16 @@
     }
 
     .header-site-title {
-        color: var(--text);
-        font-weight: 400;
-        font-size: 2rem;
-        font-family: sans-serif;
-        margin: 0;
+        text-decoration: none;
+
+        & > h1 {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 400;
+            font-size: 2rem;
+            font-family: sans-serif;
+            margin: 0;
+        }
     }
 </style>
 

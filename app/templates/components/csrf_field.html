@@ -1,0 +1,5 @@
+{{ define "csrf_field" }}
+
+<input type="hidden" name="csrf_field" value="{{ .CSRFToken }}">
+
+{{ end }}

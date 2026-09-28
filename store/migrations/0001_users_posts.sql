@@ -2,8 +2,8 @@
 CREATE TABLE IF NOT EXISTS users (
     id UUID     PRIMARY KEY DEFAULT uuidv7(),
     username    TEXT NOT NULL UNIQUE,
-    email TEXT  NOT NULL UNIQUE,
-    passwd_hash TEXT NOT NULL,
+    email       TEXT NOT NULL UNIQUE,
+    passwd_hash TEXT NOT NULL,                      -- Argon2id is usually text
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT username_length CHECK (

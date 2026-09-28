@@ -2,6 +2,7 @@
 
 <main class="submit-main">
     <form method="post" class="submit-post">
+        {{ template "csrf_field" . }}
         <h2 class="make-post-title">new post</h2>
         {{ if .Data.Error }}
         <p class="form-error">{{ .Data.Error }}</p>
