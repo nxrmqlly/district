@@ -1,0 +1,33 @@
+{{ define "login" }}
+
+<main class="auth-page">
+    <form method="post" class="auth-form">
+        <h2>log in</h2>
+        {{ if .Data.Error }}
+        <p class="form-error">{{ .Data.Error }}</p>
+        {{ end }}
+        <span class="details-parent">
+            <label for="emailoruser">{{ "email/user" }}</label>
+            <input
+                type="text"
+                id="emailoruser"
+                name="emailoruser"
+                value="{{ .Data.EmailOrUser }}"
+                placeholder="john@email.com | johndoe"
+                required
+            />
+            <label for="password">password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                minlength="8"
+                required
+            />
+        </span>
+        <button class="submit-btn" type="submit">log in</button>
+    </form>
+    <div class="alt-callout">or, <a href="/register">register</a> instead</div>
+</main>
+
+{{ end }}
