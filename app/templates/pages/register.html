@@ -1,0 +1,44 @@
+{{ define "register" }}
+
+<main class="auth-page">
+    <form method="post" class="auth-form">
+        <h2>register</h2>
+        {{ if .Data.Error }}
+        <p class="form-error">{{ .Data.Error }}</p>
+        {{ end }}
+        <span class="details-parent">
+            <label for="email">email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="john@email.com"
+                value="{{ .Data.Email }}"
+                required
+            />
+            <label for="username">username</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="johndoe"
+                minlength="3"
+                maxlength="24"
+                value="{{ .Data.Username }}"
+                required
+            />
+            <label for="password">password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                minlength="8"
+                required
+            />
+        </span>
+        <button class="submit-btn" type="submit">register</button>
+    </form>
+    <div class="alt-callout">or, <a href="/login">log in</a> instead</div>
+</main>
+
+{{ end }}

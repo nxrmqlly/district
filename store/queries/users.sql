@@ -5,7 +5,6 @@ SELECT * FROM users WHERE id = $1;
 SELECT * FROM users WHERE lower(username) = lower(sqlc.arg(username)::text);
 
 -- name: NewUser :one
-INSERT INTO users
-(id, username, email, passwd_hash, created_at)
-VALUES (uuidv7(), $1, $2, $3, NOW())
+INSERT INTO users (username, email, passwd_hash)
+VALUES ($1, $2, $3)
 RETURNING *;

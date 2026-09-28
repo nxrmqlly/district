@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 
+	"github.com/nxrmqlly/district/auth"
 	"github.com/nxrmqlly/district/store"
 )
 
@@ -14,6 +15,7 @@ type Router struct {
 	mux       *http.ServeMux
 	queries   *store.Queries
 	templates *template.Template
+	auth      *auth.Service
 
 	GlobalMws []Middleware
 }
@@ -28,6 +30,7 @@ func NewRouter(queries *store.Queries) (*Router, error) {
 		mux:       http.NewServeMux(),
 		queries:   queries,
 		templates: tmpl,
+		auth:      auth.New(queries),
 	}
 
 	err = ro.routes()
@@ -42,7 +45,7 @@ func NewRouter(queries *store.Queries) (*Router, error) {
 var staticFS embed.FS
 
 func (ro *Router) routes() error {
-	ro.GlobalMws = append(ro.GlobalMws, ro.Logging)
+	ro.GlobalMws = append(ro.GlobalMws, ro.Logging, ro.Authentication)
 
 	staticFS, err := fs.Sub(staticFS, "static")
 	if err != nil {
@@ -54,6 +57,10 @@ func (ro *Router) routes() error {
 	ro.Handle("GET  /submit", ro.handleSubmitView)
 	ro.Handle("POST /submit", ro.handleSubmitCreate)
 	ro.Handle("GET  /p/{id}", ro.handlePostGet)
+	ro.Handle("GET  /login", ro.handleLoginView)
+	ro.Handle("POST /login", ro.handleLogin)
+	ro.Handle("GET  /register", ro.handleRegisterView)
+	ro.Handle("POST /register", ro.handleRegister)
 
 	return nil
 }

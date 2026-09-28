@@ -79,7 +79,67 @@ select {
     }
 
     &:focus,
-        &:active {
-            outline: none;
+    &:active {
+        outline: none;
+    }
+}
+
+.form-error {
+    color: var(--error);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1em;
+    width: 100%;
+    gap: 1rem;
+
+    & > * {
+        width: 100%;
+    }
+
+    & > button:hover {
+        background-color: var(--surface-raised);
+        cursor: pointer;
+    }
+
+    & > .details-parent {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 1rem 0;
+
+        label {
+            padding: 0.4rem 1rem;
+            border-right: solid 1px var(--border);
+            font-size: 24px;
+            color: var(--text-muted);
+            margin: 0;
+            background-color: var(--surface-sunken);
+            border-bottom: 1px solid var(--border);
         }
+    }
+}
+
+.auth-page {
+    background-color: var(--bg);
+    margin-bottom: 2rem;
+    width: 100%;
+
+    & h2 {
+        font-weight: 400;
+        font-family: var(--font);
+    }
+
+    & .alt-callout {
+        font-size: 16px;
+        margin-top: 1.4rem;
+
+        & > a {
+            color: var(--text);
+            &:active {
+                color: var(--primary);
+            }
+        }
+    }
 }

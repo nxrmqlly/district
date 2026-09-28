@@ -46,9 +46,8 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 }
 
 const newUser = `-- name: NewUser :one
-INSERT INTO users
-(id, username, email, passwd_hash, created_at)
-VALUES (uuidv7(), $1, $2, $3, NOW())
+INSERT INTO users (username, email, passwd_hash)
+VALUES ($1, $2, $3)
 RETURNING id, username, email, passwd_hash, created_at
 `
 
