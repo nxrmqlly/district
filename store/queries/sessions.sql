@@ -11,3 +11,8 @@ JOIN users u ON u.id = s.user_id
 WHERE token_hash = $1
     AND revoked_at IS NULL
     AND expires_at > NOW();
+
+-- name: RevokeSession :exec
+UPDATE sessions
+SET revoked_at = NOW()
+WHERE id = $1;

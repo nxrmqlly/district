@@ -75,3 +75,14 @@ func (q *Queries) NewSession(ctx context.Context, arg NewSessionParams) (Session
 	)
 	return i, err
 }
+
+const revokeSession = `-- name: RevokeSession :exec
+UPDATE sessions
+SET revoked_at = NOW()
+WHERE id = $1
+`
+
+func (q *Queries) RevokeSession(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, revokeSession, id)
+	return err
+}

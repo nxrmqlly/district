@@ -66,6 +66,7 @@ func (ro *Router) routes() error {
 	ro.Handle("POST /login", ro.handleLogin)
 	ro.Handle("GET  /register", ro.handleRegisterView)
 	ro.Handle("POST /register", ro.handleRegister)
+	ro.Handle("POST /logout", ro.handleLogout, ro.RequireAuth)
 
 	return nil
 }

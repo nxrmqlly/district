@@ -65,6 +65,7 @@ func VerifyPassword(password, hash string) (bool, error) {
 }
 
 type AuthSession struct {
+	ID        uuid.UUID
 	UserID    uuid.UUID
 	Username  string
 	CreatedAt time.Time
@@ -112,6 +113,7 @@ func (s *Service) GetSession(ctx context.Context, tokenB64 string) (*AuthSession
 	}
 
 	return &AuthSession{
+		ID:        se.ID,
 		UserID:    se.UserID,
 		Username:  se.SessionUsername,
 		CreatedAt: se.CreatedAt,
@@ -176,4 +178,8 @@ func (s *Service) Authenticate(ctx context.Context, login, password string) (*Au
 		Username: user.Username,
 		Email:    user.Email,
 	}, nil
+}
+
+func (s *Service) RevokeSession(ctx context.Context, sessionID uuid.UUID) error {
+	return s.queries.RevokeSession(ctx, sessionID)
 }

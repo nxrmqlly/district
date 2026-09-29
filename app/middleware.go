@@ -58,7 +58,6 @@ func (ro *Router) Authentication(next http.Handler) http.Handler {
 
 		se, err := ro.auth.GetSession(r.Context(), cookie.Value)
 		if err != nil {
-			log.Printf("authentication mw: GetSession: %v", err)
 			next.ServeHTTP(w, r)
 			return
 		}

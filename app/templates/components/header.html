@@ -9,8 +9,10 @@
             <a href="/">home</a> | <a href="/submit">write</a>
         </div>
         <div class="user-details">
-            {{ if .Session }}
-            <span>hi {{ .Session.Username }}</span>
+            {{ if .Session }} {{ .Session.Username }} |
+            <form action="/logout" method="post">
+                <button type="submit">logout</button>
+            </form>
             {{ else }}
             <a href="/login">login</a>
             {{ end }}
@@ -50,6 +52,23 @@
             font-size: 2rem;
             font-family: sans-serif;
             margin: 0;
+        }
+    }
+
+    .user-details {
+        & form {
+            display: inline;
+        }
+        & button {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            display: inline;
+            text-decoration: underline;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 </style>

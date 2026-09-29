@@ -24,13 +24,8 @@ func SessionFromContext(ctx context.Context) (*auth.AuthSession, bool) {
 	return sess, ok
 }
 
-// create a new session and set the session cookie to the writer
-func (ro *Router) newSessionCookie(w http.ResponseWriter, r *http.Request, userId uuid.UUID) {
-	sessToken, err := ro.auth.CreateSession(r.Context(), userId)
-	if err != nil {
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
+// set the district_session cookie
+func (ro *Router) setSessionCookie(w http.ResponseWriter, sessToken string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "district_session",
 		Value:    sessToken,
@@ -39,6 +34,17 @@ func (ro *Router) newSessionCookie(w http.ResponseWriter, r *http.Request, userI
 		Secure:   false, // FIXME: secure cookie should be config driven
 		SameSite: http.SameSiteLaxMode,
 	})
+}
+
+// create a new session and set the session cookie to the writer
+func (ro *Router) newSessionCookie(w http.ResponseWriter, r *http.Request, userId uuid.UUID) {
+	sessToken, err := ro.auth.CreateSession(r.Context(), userId)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	ro.setSessionCookie(w, sessToken)
+
 }
 
 type LoginPageData struct {
@@ -176,5 +182,15 @@ func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ro.newSessionCookie(w, r, user.ID)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (ro *Router) handleLogout(w http.ResponseWriter, r *http.Request) {
+	sess, _ := SessionFromContext(r.Context())
+	if err := ro.auth.RevokeSession(r.Context(), sess.ID); err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	ro.setSessionCookie(w, "") // clear cookie
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
