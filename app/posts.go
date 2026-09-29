@@ -7,15 +7,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/nxrmqlly/district/app/httpx"
 	"github.com/nxrmqlly/district/store"
 )
 
 type SubmitPageData struct {
-	Title    string
-	Body     string
-	Error    string
+	Title string
+	Body  string
+	Error string
 }
 
 func (ro *Router) handleSubmitView(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +22,7 @@ func (ro *Router) handleSubmitView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ro *Router) handleSubmitCreate(w http.ResponseWriter, r *http.Request) {
+	sess, _ := SessionFromContext(r.Context())
 	if err := r.ParseForm(); err != nil {
 		httpx.ErrorJSON(w, http.StatusBadRequest, "invalid form")
 		return
@@ -41,7 +41,7 @@ func (ro *Router) handleSubmitCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post, err := ro.queries.NewPost(r.Context(), store.NewPostParams{
-		AuthorID: uuid.MustParse("01a0e4a6-c902-75f5-b55d-2d20c4eb1468"),
+		AuthorID: sess.UserID,
 		Title:    title,
 		Body:     body,
 		EmbedUrl: "",

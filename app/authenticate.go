@@ -163,17 +163,17 @@ func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
 	user, err := ro.auth.RegisterUser(r.Context(), email, username, password)
 	if err != nil {
 		switch {
-		case errors.Is(err, auth.ErrUsernameTaken):
-			ro.RenderPage(w, r, "register", "register", RegisterPageData{
-				Username: username,
-				Email:    email,
-				Error:    "username is already taken",
-			})
 		case errors.Is(err, auth.ErrEmailInUse):
 			ro.RenderPage(w, r, "register", "register", RegisterPageData{
 				Username: username,
 				Email:    email,
 				Error:    "email already in use",
+			})
+		case errors.Is(err, auth.ErrUsernameTaken):
+			ro.RenderPage(w, r, "register", "register", RegisterPageData{
+				Username: username,
+				Email:    email,
+				Error:    "username is already taken",
 			})
 		default:
 			http.Error(w, "internal server error", http.StatusInternalServerError)
