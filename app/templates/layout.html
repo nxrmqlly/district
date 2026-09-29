@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="/static/themes.builtin.css" />
     </head>
     <body>
-        {{ template "header" }}
+        {{ template "header" . }}
         <div class="content">{{ render .Page . }}</div>
         {{ template "footer" }}
     </body>

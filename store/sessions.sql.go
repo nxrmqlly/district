@@ -13,15 +13,28 @@ import (
 )
 
 const getSessionByTokenHash = `-- name: GetSessionByTokenHash :one
-SELECT id, user_id, token_hash, created_at, expires_at, last_used, revoked_at from sessions
+SELECT s.id, s.user_id, s.token_hash, s.created_at, s.expires_at, s.last_used, s.revoked_at, u.username as session_username
+FROM sessions s
+JOIN users u ON u.id = s.user_id
 WHERE token_hash = $1
     AND revoked_at IS NULL
     AND expires_at > NOW()
 `
 
-func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash []byte) (Session, error) {
+type GetSessionByTokenHashRow struct {
+	ID              uuid.UUID
+	UserID          uuid.UUID
+	TokenHash       []byte
+	CreatedAt       time.Time
+	ExpiresAt       time.Time
+	LastUsed        *time.Time
+	RevokedAt       *time.Time
+	SessionUsername string
+}
+
+func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash []byte) (GetSessionByTokenHashRow, error) {
 	row := q.db.QueryRow(ctx, getSessionByTokenHash, tokenHash)
-	var i Session
+	var i GetSessionByTokenHashRow
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
@@ -30,6 +43,7 @@ func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash []byte) (
 		&i.ExpiresAt,
 		&i.LastUsed,
 		&i.RevokedAt,
+		&i.SessionUsername,
 	)
 	return i, err
 }

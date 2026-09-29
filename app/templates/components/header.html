@@ -9,7 +9,11 @@
             <a href="/">home</a> | <a href="/submit">write</a>
         </div>
         <div class="user-details">
+            {{ if .Session }}
+            <span>hi {{ .Session.Username }}</span>
+            {{ else }}
             <a href="/login">login</a>
+            {{ end }}
         </div>
     </nav>
 </header>

@@ -5,7 +5,9 @@ VALUES ($1, $2, $3)
 RETURNING *;
 
 -- name: GetSessionByTokenHash :one
-SELECT * from sessions
+SELECT s.*, u.username as session_username
+FROM sessions s
+JOIN users u ON u.id = s.user_id
 WHERE token_hash = $1
     AND revoked_at IS NULL
     AND expires_at > NOW();

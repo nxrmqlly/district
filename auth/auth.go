@@ -66,6 +66,7 @@ func VerifyPassword(password, hash string) (bool, error) {
 
 type AuthSession struct {
 	UserID    uuid.UUID
+	Username  string
 	CreatedAt time.Time
 	ExpiresAt time.Time
 	LastUsed  *time.Time
@@ -112,6 +113,7 @@ func (s *Service) GetSession(ctx context.Context, tokenB64 string) (*AuthSession
 
 	return &AuthSession{
 		UserID:    se.UserID,
+		Username:  se.SessionUsername,
 		CreatedAt: se.CreatedAt,
 		ExpiresAt: se.ExpiresAt,
 		LastUsed:  se.LastUsed,
