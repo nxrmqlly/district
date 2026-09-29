@@ -51,8 +51,9 @@ func (ro *Router) routes() error {
 	if err != nil {
 		return err
 	}
-	ro.mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
+	
 
+	ro.mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
 	ro.Handle("GET  /{$}", ro.handleHome)
 	ro.Handle("GET  /submit", ro.handleSubmitView)
 	ro.Handle("POST /submit", ro.handleSubmitCreate)

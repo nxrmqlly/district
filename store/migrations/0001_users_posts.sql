@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT username_length CHECK (
-        char_length(username) >= 3 AND char_length(username) <= 40
+        char_length(username) >= 3 AND char_length(username) <= 24
     )
 );
 

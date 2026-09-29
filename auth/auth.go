@@ -65,7 +65,6 @@ func VerifyPassword(password, hash string) (bool, error) {
 
 type AuthSession struct {
 	UserID    uuid.UUID
-	CSRFHash  []byte
 	CreatedAt time.Time
 	ExpiresAt time.Time
 	LastUsed  *time.Time
@@ -83,18 +82,11 @@ func (s *Service) CreateSession(ctx context.Context, userID uuid.UUID) (string, 
 		return "", err
 	}
 
-	csrfToken, err := randomToken()
-	if err != nil {
-		return "", err
-	}
-
 	tokHash := sha256sum(sessionToken)
-	csrfHash := sha256sum(csrfToken)
 
 	_, err = s.queries.NewSession(ctx, store.NewSessionParams{
 		UserID:    userID,
 		TokenHash: tokHash,
-		CsrfHash:  csrfHash,
 		ExpiresAt: time.Now().Add(SessionLifetime),
 	})
 
@@ -114,7 +106,6 @@ func (s *Service) GetSession(ctx context.Context, token string) (*AuthSession, e
 
 	return &AuthSession{
 		UserID:    se.UserID,
-		CSRFHash:  se.CsrfHash,
 		CreatedAt: se.CreatedAt,
 		ExpiresAt: se.ExpiresAt,
 		LastUsed:  se.LastUsed,

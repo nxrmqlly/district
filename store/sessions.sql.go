@@ -13,7 +13,7 @@ import (
 )
 
 const getSessionByTokenHash = `-- name: GetSessionByTokenHash :one
-SELECT id, user_id, token_hash, csrf_hash, created_at, expires_at, last_used, revoked_at from sessions
+SELECT id, user_id, token_hash, created_at, expires_at, last_used, revoked_at from sessions
 WHERE token_hash = $1
     AND revoked_at IS NULL
     AND expires_at > NOW()
@@ -26,7 +26,6 @@ func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash []byte) (
 		&i.ID,
 		&i.UserID,
 		&i.TokenHash,
-		&i.CsrfHash,
 		&i.CreatedAt,
 		&i.ExpiresAt,
 		&i.LastUsed,
@@ -37,31 +36,24 @@ func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash []byte) (
 
 const newSession = `-- name: NewSession :one
 INSERT INTO sessions
-(user_id, token_hash, csrf_hash, expires_at)
-VALUES ($1, $2, $3, $4)
-RETURNING id, user_id, token_hash, csrf_hash, created_at, expires_at, last_used, revoked_at
+(user_id, token_hash, expires_at)
+VALUES ($1, $2, $3)
+RETURNING id, user_id, token_hash, created_at, expires_at, last_used, revoked_at
 `
 
 type NewSessionParams struct {
 	UserID    uuid.UUID
 	TokenHash []byte
-	CsrfHash  []byte
 	ExpiresAt time.Time
 }
 
 func (q *Queries) NewSession(ctx context.Context, arg NewSessionParams) (Session, error) {
-	row := q.db.QueryRow(ctx, newSession,
-		arg.UserID,
-		arg.TokenHash,
-		arg.CsrfHash,
-		arg.ExpiresAt,
-	)
+	row := q.db.QueryRow(ctx, newSession, arg.UserID, arg.TokenHash, arg.ExpiresAt)
 	var i Session
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
 		&i.TokenHash,
-		&i.CsrfHash,
 		&i.CreatedAt,
 		&i.ExpiresAt,
 		&i.LastUsed,

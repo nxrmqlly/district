@@ -23,7 +23,6 @@ type Session struct {
 	ID        uuid.UUID
 	UserID    uuid.UUID
 	TokenHash []byte
-	CsrfHash  []byte
 	CreatedAt time.Time
 	ExpiresAt time.Time
 	LastUsed  *time.Time
