@@ -18,7 +18,6 @@ var templatesFS embed.FS
 type PageContext struct {
 	Page      string
 	Title     string
-	CSRFToken string
 	Site      any
 	Data      any
 }

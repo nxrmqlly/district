@@ -45,13 +45,17 @@ func NewRouter(queries *store.Queries) (*Router, error) {
 var staticFS embed.FS
 
 func (ro *Router) routes() error {
-	ro.GlobalMws = append(ro.GlobalMws, ro.Logging, ro.Authentication)
+	csrf := http.NewCrossOriginProtection()
+	ro.GlobalMws = append(ro.GlobalMws,
+		ro.Logging,        // the csrf handler should ideally go after logging, so caught 403s
+		csrf.Handler,      // are logged.
+		ro.Authentication, //
+	)
 
 	staticFS, err := fs.Sub(staticFS, "static")
 	if err != nil {
 		return err
 	}
-	
 
 	ro.mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
 	ro.Handle("GET  /{$}", ro.handleHome)
