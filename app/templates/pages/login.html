@@ -7,13 +7,13 @@
         <p class="form-error">{{ .Data.Error }}</p>
         {{ end }}
         <span class="details-parent">
-            <label for="emailoruser">{{ "email/user" }}</label>
+            <label for="login">email/user</label>
             <input
                 type="text"
-                id="emailoruser"
-                name="emailoruser"
-                value="{{ .Data.EmailOrUser }}"
-                placeholder="john@email.com | johndoe"
+                id="login"
+                name="login"
+                value="{{ .Data.Login }}"
+                placeholder="john@email.com || johndoe"
                 required
             />
             <label for="password">password</label>

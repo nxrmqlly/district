@@ -13,9 +13,9 @@ import (
 )
 
 type SubmitPageData struct {
-	Title string
-	Body  string
-	Error string
+	Title    string
+	Body     string
+	Error    string
 }
 
 func (ro *Router) handleSubmitView(w http.ResponseWriter, r *http.Request) {

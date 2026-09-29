@@ -3,30 +3,53 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"net/mail"
 	"regexp"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/nxrmqlly/district/app/httpx"
 	"github.com/nxrmqlly/district/auth"
 )
 
 var usernameRE = regexp.MustCompile(`^[A-Za-z0-9_]{3,24}$`)
 
+// SessionFromContext derives the auth session from the request context.
+// ok is true for authenticated sessions and false for anonymous sessions
 func SessionFromContext(ctx context.Context) (*auth.AuthSession, bool) {
 	sess, ok := ctx.Value(sessionKey).(*auth.AuthSession)
 	return sess, ok
 }
 
+// create a new session and set the session cookie to the writer
+func (ro *Router) newSessionCookie(w http.ResponseWriter, r *http.Request, userId uuid.UUID) {
+	sessToken, err := ro.auth.CreateSession(r.Context(), userId)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "district_session",
+		Value:    sessToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false, // FIXME: secure cookie should be config driven
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
 type LoginPageData struct {
-	EmailOrUser string
-	Error       string
+	Login string
+	Error string
 }
 
 func (ro *Router) handleLoginView(w http.ResponseWriter, r *http.Request) {
 	// already logged in
 	if _, ok := SessionFromContext(r.Context()); ok {
+		fmt.Println("/login: user already logged in, redirecting...")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -35,7 +58,38 @@ func (ro *Router) handleLoginView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ro *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	if _, ok := SessionFromContext(r.Context()); ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	login := strings.TrimSpace(r.FormValue("login"))
+	password := r.FormValue("password")
+
+	user, err := ro.auth.Authenticate(r.Context(), login, password)
+	if err != nil {
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			ro.RenderPage(w, r, "login", "login", LoginPageData{
+				Error: "invalid login or password",
+				Login: login,
+			})
+		} else {
+			log.Printf("err: /login: %s", err.Error())
+			ro.RenderPage(w, r, "login", "login", LoginPageData{
+				Error: "internal server error",
+				Login: login,
+			})
+		}
+		return
+	}
+
+	ro.newSessionCookie(w, r, user.ID)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 type RegisterPageData struct {
@@ -47,6 +101,7 @@ type RegisterPageData struct {
 func (ro *Router) handleRegisterView(w http.ResponseWriter, r *http.Request) {
 	// already logged in
 	if _, ok := SessionFromContext(r.Context()); ok {
+		fmt.Println("/register: user already logged in, redirecting...")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -55,6 +110,11 @@ func (ro *Router) handleRegisterView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
+	if _, ok := SessionFromContext(r.Context()); ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
 		httpx.ErrorJSON(w, http.StatusBadRequest, "invalid form")
 		return
@@ -62,7 +122,7 @@ func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	email := strings.TrimSpace(r.FormValue("email"))
 	username := strings.TrimSpace(r.FormValue("username"))
-	password := strings.TrimSpace(r.FormValue("password"))
+	password := r.FormValue("password")
 
 	verrs := ""
 
@@ -115,20 +175,6 @@ func (ro *Router) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sessToken, err := ro.auth.CreateSession(r.Context(), user.ID)
-	if err != nil {
-		http.Error(w, "internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     "district_session",
-		Value:    sessToken,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   false, // FIXME: secure cookie should be config driven
-		SameSite: http.SameSiteLaxMode,
-	})
-
+	ro.newSessionCookie(w, r, user.ID)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

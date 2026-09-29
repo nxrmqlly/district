@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/base64"
 	"errors"
 	"time"
@@ -97,9 +98,14 @@ func (s *Service) CreateSession(ctx context.Context, userID uuid.UUID) (string, 
 	return base64.RawURLEncoding.EncodeToString(sessionToken), nil
 }
 
-func (s *Service) GetSession(ctx context.Context, token string) (*AuthSession, error) {
-	tokHash := sha256sum([]byte(token))
-	se, err := s.queries.GetSessionByTokenHash(ctx, tokHash)
+func (s *Service) GetSession(ctx context.Context, tokenB64 string) (*AuthSession, error) {
+	raw, err := base64.RawURLEncoding.DecodeString(tokenB64)
+	if err != nil {
+		return nil, err
+	}
+
+	hashed := sha256sum([]byte(raw))
+	se, err := s.queries.GetSessionByTokenHash(ctx, hashed)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +142,32 @@ func (s *Service) RegisterUser(ctx context.Context, email, username, passwd stri
 		}
 		return nil, err
 	}
+
+	return &AuthUser{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+	}, nil
+}
+
+func (s *Service) Authenticate(ctx context.Context, login, password string) (*AuthUser, error) {
+	user, err := s.queries.GetUserByLogin(ctx, login)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrInvalidCredentials
+		}
+		return nil, err
+	}
+
+	ok, err := VerifyPassword(password, user.PasswdHash)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, ErrInvalidCredentials
+	}
+
+	// * creds matched
 
 	return &AuthUser{
 		ID:       user.ID,

@@ -59,8 +59,8 @@ func (ro *Router) routes() error {
 
 	ro.mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
 	ro.Handle("GET  /{$}", ro.handleHome)
-	ro.Handle("GET  /submit", ro.handleSubmitView)
-	ro.Handle("POST /submit", ro.handleSubmitCreate)
+	ro.Handle("GET  /submit", ro.handleSubmitView, ro.RequireAuthRedirect)
+	ro.Handle("POST /submit", ro.handleSubmitCreate, ro.RequireAuth)
 	ro.Handle("GET  /p/{id}", ro.handlePostGet)
 	ro.Handle("GET  /login", ro.handleLoginView)
 	ro.Handle("POST /login", ro.handleLogin)
