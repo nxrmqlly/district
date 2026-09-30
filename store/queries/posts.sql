@@ -1,5 +1,8 @@
 -- name: GetPost :one
-SELECT * FROM posts WHERE id = $1;
+SELECT p.*, u.username as author_username
+FROM posts p
+JOIN users u ON u.id = p.author_id
+WHERE p.id = $1;
 
 -- name: NewPost :one
 INSERT INTO posts

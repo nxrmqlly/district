@@ -1,0 +1,40 @@
+{{ define "post" }}
+<main class="post-page">
+    <div class="post">
+        <div class="post-title">
+            <h2>{{ .Data.Title }} <span>[#{{ .Data.ID }}]</span></h2>
+        </div>
+        <div class="post-meta">
+            <span> {{ .Data.AuthorUsername }} </span>
+            <span> | {{ timeago .Data.CreatedAt }} </span>
+            <span>
+                {{ if and .Session (eq .Data.AuthorID .Session.UserID) }} | edit {{ end }}
+            </span>
+        </div>
+        <div class="post-body">{{ .Data.Body }}</div>
+    </div>
+</main>
+
+<style>
+    .post-title {
+        & > h2 {
+            margin-bottom: 0.5rem;
+            font-weight: 400;
+            font-family: var(--font);
+        }
+        & > h2 > span {
+            color: var(--text-subtle);
+        }
+    }
+
+    .post-body {
+        margin-top: 1rem;
+        white-space: pre-wrap;
+    }
+
+    .post-meta {
+        font-size: 16px;
+        color: var(--text-muted);
+    }
+</style>
+{{ end }}

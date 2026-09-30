@@ -13,12 +13,25 @@ import (
 )
 
 const getPost = `-- name: GetPost :one
-SELECT id, author_id, title, embed_url, body, created_at FROM posts WHERE id = $1
+SELECT p.id, p.author_id, p.title, p.embed_url, p.body, p.created_at, u.username as author_username
+FROM posts p
+JOIN users u ON u.id = p.author_id
+WHERE p.id = $1
 `
 
-func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
+type GetPostRow struct {
+	ID             int64
+	AuthorID       uuid.UUID
+	Title          string
+	EmbedUrl       string
+	Body           string
+	CreatedAt      time.Time
+	AuthorUsername string
+}
+
+func (q *Queries) GetPost(ctx context.Context, id int64) (GetPostRow, error) {
 	row := q.db.QueryRow(ctx, getPost, id)
-	var i Post
+	var i GetPostRow
 	err := row.Scan(
 		&i.ID,
 		&i.AuthorID,
@@ -26,6 +39,7 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (Post, error) {
 		&i.EmbedUrl,
 		&i.Body,
 		&i.CreatedAt,
+		&i.AuthorUsername,
 	)
 	return i, err
 }

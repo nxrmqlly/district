@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/nxrmqlly/district/auth"
 	"github.com/nxrmqlly/district/config"
@@ -41,11 +42,28 @@ func renderDirective(root *template.Template) func(string, any) (template.HTML, 
 	}
 }
 
+func TimeAgo(t time.Time) string {
+	d := time.Since(t)
+	switch {
+	case d < time.Minute:
+		return "just now"
+	case d < time.Hour:
+		return fmt.Sprintf("%dm ago", int(d.Minutes()))
+	case d < 24*time.Hour:
+		return fmt.Sprintf("%dh ago", int(d.Hours()))
+	case d < 30*24*time.Hour:
+		return fmt.Sprintf("%dd ago", int(d.Hours()/24))
+	default:
+		return t.Format("2 Jan 2006")
+	}
+}
+
 func parseTemplates() (*template.Template, error) {
 	root := template.New("")
 
 	root.Funcs(template.FuncMap{
-		"render": renderDirective(root),
+		"render":  renderDirective(root),
+		"timeago": TimeAgo,
 	})
 
 	if err := fs.WalkDir(templatesFS, ".", func(path string, d fs.DirEntry, err error) error {

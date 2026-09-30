@@ -55,6 +55,16 @@ func (ro *Router) handleSubmitCreate(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/p/%d", post.ID), http.StatusSeeOther)
 }
 
+// type PostPageData struct {
+// 	Title     string
+// 	Body      string
+// 	EmbedUrl  string
+// 	Username  string
+// 	AuthorID  uuid.UUID
+// 	ID        int64
+// 	CreatedAt time.Time
+// }
+
 func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
@@ -69,5 +79,5 @@ func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpx.WriteJSON(w, http.StatusOK, post)
+	ro.RenderPage(w, r, "post", post.Title, post)
 }
