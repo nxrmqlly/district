@@ -1,0 +1,16 @@
+[site]
+name = "district."
+description = "bring back y2k forums"
+default_theme = "ayu-dark"
+
+[server]
+address = ":2468"
+
+[session]
+secure = false
+lifetime = "720h" # 30 days
+
+[registration]
+enabled = true
+require_email_verify = false
+invite_only = false

@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/nxrmqlly/district/app/httpx"
 	"github.com/nxrmqlly/district/auth"
+	"github.com/nxrmqlly/district/config"
 )
 
 var usernameRE = regexp.MustCompile(`^[A-Za-z0-9_]{3,24}$`)
@@ -31,7 +32,7 @@ func (ro *Router) setSessionCookie(w http.ResponseWriter, sessToken string) {
 		Value:    sessToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   false, // FIXME: secure cookie should be config driven
+		Secure:   config.Get().Session.Secure,
 		SameSite: http.SameSiteLaxMode,
 	})
 }

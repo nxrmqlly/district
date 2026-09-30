@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/nxrmqlly/district/auth"
+	"github.com/nxrmqlly/district/config"
 )
 
 //go:embed templates
@@ -19,7 +21,7 @@ type PageContext struct {
 	Page    string
 	Title   string
 	Session *auth.AuthSession
-	Site    any // TODO: Config driven site Data
+	Site    config.Site
 	Data    any
 }
 
@@ -67,14 +69,16 @@ func parseTemplates() (*template.Template, error) {
 
 func (ro *Router) RenderPage(w http.ResponseWriter, r *http.Request, page, title string, data any) {
 	sess, _ := SessionFromContext(r.Context())
-	if err := ro.templates.ExecuteTemplate(w, "layout", PageContext{
+	pc := PageContext{
 		Page:    page,
 		Title:   title,
-		Site:    nil,
+		Site:    config.Get().Site,
 		Session: sess,
 		Data:    data,
-	}); err != nil {
+	}
+	if err := ro.templates.ExecuteTemplate(w, "layout", pc); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	log.Println(pc.Site.Name)
 }

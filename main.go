@@ -9,11 +9,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/nxrmqlly/district/app"
+	"github.com/nxrmqlly/district/config"
 	"github.com/nxrmqlly/district/store"
 )
 
 func main() {
 	godotenv.Load()
+	config.MustEnv("POSTGRES_CONNSTR")
+	config.MustLoad()
 
 	ctx := context.Background()
 
@@ -36,7 +39,7 @@ func main() {
 	}
 
 	srv := http.Server{
-		Addr:    os.Getenv("BIND_ADDR"),
+		Addr:    config.Get().Server.Address,
 		Handler: router,
 	}
 
