@@ -142,3 +142,19 @@ select {
         }
     }
 }
+
+.comment {
+    border-left: 2px solid var(--surface);
+    padding-left: 2rem;
+}
+.comment-meta {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.subtle-link {
+    color: var(--text-subtle);
+    &:visited {
+        color: var(--text-muted);
+    }
+}

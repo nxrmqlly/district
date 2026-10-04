@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -87,16 +86,14 @@ func parseTemplates() (*template.Template, error) {
 
 func (ro *Router) RenderPage(w http.ResponseWriter, r *http.Request, page, title string, data any) {
 	sess, _ := SessionFromContext(r.Context())
-	pc := PageContext{
+	if err := ro.templates.ExecuteTemplate(w, "layout", PageContext{
 		Page:    page,
 		Title:   title,
 		Site:    config.Get().Site,
 		Session: sess,
 		Data:    data,
-	}
-	if err := ro.templates.ExecuteTemplate(w, "layout", pc); err != nil {
+	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Println(pc.Site.Name)
 }

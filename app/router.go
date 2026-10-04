@@ -47,9 +47,9 @@ var staticFS embed.FS
 func (ro *Router) routes() error {
 	csrf := http.NewCrossOriginProtection()
 	ro.GlobalMws = append(ro.GlobalMws,
-		ro.Logging,        // the csrf handler should ideally go after logging, so caught 403s
-		csrf.Handler,      // are logged.
-		ro.Authentication, //
+		ro.Logging,        // the csrf handler should ideally go after logging,
+		csrf.Handler,      //     so caught 403s are logged.
+		ro.Authentication, // generic auth
 	)
 
 	staticFS, err := fs.Sub(staticFS, "static")
@@ -62,6 +62,7 @@ func (ro *Router) routes() error {
 	ro.Handle("GET  /submit", ro.handleSubmitView, ro.RequireAuthRedirect)
 	ro.Handle("POST /submit", ro.handleSubmitCreate, ro.RequireAuth)
 	ro.Handle("GET  /p/{id}", ro.handlePostGet)
+	ro.Handle("POST /p/{id}/comment", ro.handleCommentCreate, ro.RequireAuth)
 	ro.Handle("GET  /login", ro.handleLoginView)
 	ro.Handle("POST /login", ro.handleLogin)
 	ro.Handle("GET  /register", ro.handleRegisterView)

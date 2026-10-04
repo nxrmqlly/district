@@ -1,0 +1,13 @@
+{{ define "comment" }}
+<div class="comment">
+    <div class="comment-meta">
+        <span> {{ .Data.AuthorUsername }} </span>
+        <span> | {{ timeago .Data.CreatedAt }} </span>
+        <span>
+            {{ if and .Session (eq .Data.AuthorID .Session.UserID) }} | edit {{
+            end }}
+        </span>
+    </div>
+    <div class="comment-body">{{ .Data.Body }}</div>
+</div>
+{{ end }}

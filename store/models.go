@@ -10,6 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Comment struct {
+	ID        int64
+	PostID    int64
+	ParentID  *int64
+	AuthorID  uuid.UUID
+	Body      string
+	CreatedAt time.Time
+	DeletedAt *time.Time
+}
+
 type Post struct {
 	ID        int64
 	AuthorID  uuid.UUID
@@ -17,6 +27,7 @@ type Post struct {
 	EmbedUrl  string
 	Body      string
 	CreatedAt time.Time
+	DeletedAt *time.Time
 }
 
 type Session struct {
@@ -35,4 +46,5 @@ type User struct {
 	Email      string
 	PasswdHash string
 	CreatedAt  time.Time
+	DeletedAt  *time.Time
 }

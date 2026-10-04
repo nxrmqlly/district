@@ -12,7 +12,7 @@ import (
 )
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, email, passwd_hash, created_at FROM users WHERE id = $1
+SELECT id, username, email, passwd_hash, created_at, deleted_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
@@ -24,12 +24,13 @@ func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Email,
 		&i.PasswdHash,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
 
 const getUserByLogin = `-- name: GetUserByLogin :one
-SELECT id, username, email, passwd_hash, created_at FROM users
+SELECT id, username, email, passwd_hash, created_at, deleted_at FROM users
 WHERE lower(email) = lower($1::text)
     OR lower(username) = lower($1::text)
 `
@@ -43,12 +44,13 @@ func (q *Queries) GetUserByLogin(ctx context.Context, login string) (User, error
 		&i.Email,
 		&i.PasswdHash,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, email, passwd_hash, created_at FROM users WHERE lower(username) = lower($1::text)
+SELECT id, username, email, passwd_hash, created_at, deleted_at FROM users WHERE lower(username) = lower($1::text)
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -60,6 +62,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.Email,
 		&i.PasswdHash,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
@@ -67,7 +70,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 const newUser = `-- name: NewUser :one
 INSERT INTO users (username, email, passwd_hash)
 VALUES ($1, $2, $3)
-RETURNING id, username, email, passwd_hash, created_at
+RETURNING id, username, email, passwd_hash, created_at, deleted_at
 `
 
 type NewUserParams struct {
@@ -85,6 +88,7 @@ func (q *Queries) NewUser(ctx context.Context, arg NewUserParams) (User, error) 
 		&i.Email,
 		&i.PasswdHash,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }

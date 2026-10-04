@@ -13,7 +13,7 @@ import (
 )
 
 const getPost = `-- name: GetPost :one
-SELECT p.id, p.author_id, p.title, p.embed_url, p.body, p.created_at, u.username as author_username
+SELECT p.id, p.author_id, p.title, p.embed_url, p.body, p.created_at, p.deleted_at, u.username as author_username
 FROM posts p
 JOIN users u ON u.id = p.author_id
 WHERE p.id = $1
@@ -26,6 +26,7 @@ type GetPostRow struct {
 	EmbedUrl       string
 	Body           string
 	CreatedAt      time.Time
+	DeletedAt      *time.Time
 	AuthorUsername string
 }
 
@@ -39,13 +40,14 @@ func (q *Queries) GetPost(ctx context.Context, id int64) (GetPostRow, error) {
 		&i.EmbedUrl,
 		&i.Body,
 		&i.CreatedAt,
+		&i.DeletedAt,
 		&i.AuthorUsername,
 	)
 	return i, err
 }
 
 const getPostsByUsername = `-- name: GetPostsByUsername :many
-SELECT p.id, p.author_id, p.title, p.embed_url, p.body, p.created_at, u.username as author_username
+SELECT p.id, p.author_id, p.title, p.embed_url, p.body, p.created_at, p.deleted_at, u.username as author_username
 FROM posts p
 JOIN users u ON u.id = p.author_id
 WHERE lower(u.username) = lower($1::text)
@@ -59,6 +61,7 @@ type GetPostsByUsernameRow struct {
 	EmbedUrl       string
 	Body           string
 	CreatedAt      time.Time
+	DeletedAt      *time.Time
 	AuthorUsername string
 }
 
@@ -78,6 +81,7 @@ func (q *Queries) GetPostsByUsername(ctx context.Context, username string) ([]Ge
 			&i.EmbedUrl,
 			&i.Body,
 			&i.CreatedAt,
+			&i.DeletedAt,
 			&i.AuthorUsername,
 		); err != nil {
 			return nil, err
@@ -94,7 +98,7 @@ const newPost = `-- name: NewPost :one
 INSERT INTO posts
 (author_id, title, embed_url, body)
 VALUES ($1, $2, $3, $4)
-RETURNING id, author_id, title, embed_url, body, created_at
+RETURNING id, author_id, title, embed_url, body, created_at, deleted_at
 `
 
 type NewPostParams struct {
@@ -119,6 +123,7 @@ func (q *Queries) NewPost(ctx context.Context, arg NewPostParams) (Post, error) 
 		&i.EmbedUrl,
 		&i.Body,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
