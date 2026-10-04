@@ -15,12 +15,12 @@ import (
 const createComment = `-- name: CreateComment :one
 INSERT INTO comments
 (post_id, parent_id, author_id, body)
-SELECT $1, $2, $3, $4   -- creates a custom row here
-WHERE $2 IS NULL        -- stop here if parent comment
+SELECT $1, $2, $3, $4     -- creates a custom row here
+WHERE $2::BIGINT IS NULL  -- stop here if parent comment
 OR EXISTS (
-    SELECT 1            -- discard, returns true if succeeds
+    SELECT 1              -- discard, returns true if succeeds
     FROM comments
-    WHERE id = $2       --  check if the parent comment exists on the post
+    WHERE id = $2::BIGINT --  check if the parent comment exists on the post
         AND post_id = $1
 )
 RETURNING id, post_id, parent_id, author_id, body, created_at, deleted_at
@@ -58,7 +58,7 @@ SELECT c.id, c.post_id, c.parent_id, c.author_id, c.body, c.created_at, c.delete
 FROM comments c
 JOIN users u ON u.id = c.author_id
 WHERE c.post_id = $1
-ORDER BY c.created_at ASC
+ORDER BY c.created_at ASC, c.id ASC
 `
 
 type GetCommentsByPostRow struct {

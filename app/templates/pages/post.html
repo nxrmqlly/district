@@ -19,6 +19,7 @@
         <div class="post-body">{{ .Data.Body }}</div>
     </div>
 
+    {{ if .Session }}
     <form
         method="post"
         action="/p/{{ .Data.ID }}/comment"
@@ -26,36 +27,37 @@
     >
         <input type="hidden" name="parent_id" value="" />
         <textarea
+            minlength="1"
             name="body"
             id="comment_body"
             placeholder="write a comment..."
+            required
         >
+        {{- "" -}}
         </textarea>
-        <button>comment</button>
+        <button type="submit">comment</button>
     </form>
+    {{ else }}
+    <p><a href="/login">log in</a> to leave a comment</p>
+    {{ end }}
+
+    <div class="comments">
+        <h3>discussion</h3>
+        <div class="comments-inner">
+            {{ range .Data.Comments }} {{ template "comment" . }} {{ end }}
+        </div>
+    </div>
 </main>
 
 <style>
-    .post-meta-link {
-        color: var(--text-muted);
+    .post-page {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
     }
 
-    .new-comment-form {
-        display: flex;
-        padding: 0;
-        width: 100%;
-
-        & > textarea {
-            width: 80%;
-        }
-
-        & > button {
-            border-left: 1px solid var(--surface-raised);
-            width: 20%;
-            flex: 1;
-            min-width: 0;
-            margin: 0;
-        }
+    .post-meta-link {
+        color: var(--text-muted);
     }
 
     .post-title {
@@ -79,8 +81,44 @@
         font-size: 16px;
         color: var(--text-muted);
     }
-    .post {
-        margin-bottom: 3rem;
+
+    .new-comment-form {
+        display: flex;
+        padding: 0;
+        height: min-content;
+
+        & > textarea {
+            height: 3rem;
+            margin: 0;
+            flex: 1;
+            min-width: 0;
+        }
+
+        & > button {
+            border-left: 1px solid var(--border);
+            width: 20%;
+            flex: 0 0 auto;
+            min-width: 0;
+            margin: 0;
+        }
+    }
+
+    .comments {
+        h3 {
+            margin: 0 0 0.5rem 0;
+            font-weight: 400;
+            font-family: var(--font);
+        }
+
+        & .comments-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            & > :nth-child(odd) {
+                background-color: var(--surface);
+            }
+        }
     }
 </style>
 {{ end }}

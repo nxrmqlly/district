@@ -1,13 +1,19 @@
 {{ define "comment" }}
 <div class="comment">
     <div class="comment-meta">
-        <span> {{ .Data.AuthorUsername }} </span>
-        <span> | {{ timeago .Data.CreatedAt }} </span>
-        <span>
-            {{ if and .Session (eq .Data.AuthorID .Session.UserID) }} | edit {{
-            end }}
-        </span>
+        <span> {{ .AuthorUsername }} </span>
+        <span> | {{ timeago .CreatedAt }} </span>
     </div>
-    <div class="comment-body">{{ .Data.Body }}</div>
+    <div class="comment-body">
+        {{ if .DeletedAt }}
+        <span class="deleted">[deleted]</span>
+        {{ else }} {{ .Body }} {{ end }}
+    </div>
+
+    {{ if .Children }}
+    <div class="comment-children">
+        {{ range .Children }} {{ template "comment" . }} {{ end }}
+    </div>
+    {{ end }}
 </div>
 {{ end }}

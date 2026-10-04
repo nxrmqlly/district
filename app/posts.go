@@ -55,15 +55,11 @@ func (ro *Router) handleSubmitCreate(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/p/%d", post.ID), http.StatusSeeOther)
 }
 
-// type PostPageData struct {
-// 	Title     string
-// 	Body      string
-// 	EmbedUrl  string
-// 	Username  string
-// 	AuthorID  uuid.UUID
-// 	ID        int64
-// 	CreatedAt time.Time
-// }
+type PostPageData struct {
+	store.GetPostRow
+
+	Comments []*CommentTree
+}
 
 func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
@@ -75,9 +71,23 @@ func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 
 	post, err := ro.queries.GetPost(r.Context(), id)
 	if err != nil {
-		httpx.ErrorJSON(w, http.StatusInternalServerError, "uh oh.")
+		httpx.ErrorJSON(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
-	ro.RenderPage(w, r, "post", post.Title, post)
+	comments, err := ro.queries.GetCommentsByPost(r.Context(), id)
+	if err != nil {
+		httpx.ErrorJSON(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+
+	ct := buildCommentTree(comments)
+
+	log.Printf("comments: %+v", comments)
+	log.Printf("tree: %+v", ct)
+
+	ro.RenderPage(w, r, "post", post.Title, PostPageData{
+		GetPostRow: post,
+		Comments:   ct,
+	})
 }
