@@ -57,12 +57,17 @@ func timeagoFunc(t time.Time) string {
 	}
 }
 
+func arrFunc(els ...any) []any {
+	return els
+}
+
 func parseTemplates() (*template.Template, error) {
 	root := template.New("")
 
 	root.Funcs(template.FuncMap{
 		"render":  renderFunc(root),
 		"timeago": timeagoFunc,
+		"arr":     arrFunc,
 	})
 
 	if err := fs.WalkDir(templatesFS, ".", func(path string, d fs.DirEntry, err error) error {

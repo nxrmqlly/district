@@ -35,12 +35,10 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 	var parentID *int64
 
 	rawPID := strings.TrimSpace(r.Form.Get("parent_id"))
-	log.Printf("raw parent id: %q", rawPID)
 	// parent id is nil = top lvl comment
 	if rawPID != "" {
 		pid, err := strconv.ParseInt(rawPID, 10, 64)
 		if err != nil {
-			log.Printf("parse parent id: %v", err)
 			http.Error(w, "error parsing parent_id", http.StatusBadRequest)
 			return
 		}
@@ -63,8 +61,6 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Println(err)
-
 		if errors.Is(err, pgx.ErrNoRows) || errors.Is(err, sql.ErrNoRows) {
 			httpx.ErrorJSON(w, http.StatusBadRequest, "invalid parent comment")
 			return

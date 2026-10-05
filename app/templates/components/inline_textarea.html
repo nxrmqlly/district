@@ -1,0 +1,29 @@
+{{ define "inline_textarea" }}
+
+<!-- -->
+{{ $name := index . 0 }}
+<!-- -->
+{{ $placeholder := index . 1 }}
+
+<div class="__input-group" x-data="{ content: '' }">
+    <div
+        class="__form-visual-box contenteditable-div"
+        contenteditable="true"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="{{ $placeholder }}"
+        @input="content = $el.innerText"
+        data-placeholder="{{ $placeholder }}"
+    ></div>
+    <input
+        class="__hidden-validator"
+        type="text"
+        name="{{ $name }}"
+        id="{{ $name }}"
+        x-model="content"
+        required
+        minlength="1"
+    />
+</div>
+
+{{ end }}

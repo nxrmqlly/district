@@ -92,26 +92,24 @@
     .new-comment-form {
         display: flex;
         padding: 0;
+        gap: 1rem;
         height: min-content;
+        flex-direction: column;
 
         & > textarea {
-            height: 3rem;
+            height: 1rem;
+            padding: 0.5rem 1rem;
             margin: 0;
             flex: 1;
             min-width: 0;
         }
 
         & > button {
-            border-left: 1px solid var(--border);
-            width: 20%;
+            /*border-left: 1px solid var(--border);*/
+            /*width: 20%;*/
             flex: 0 0 auto;
             min-width: 0;
             margin: 0;
-
-            &:hover {
-                background-color: var(--surface-raised);
-                cursor: pointer;
-            }
         }
     }
 
@@ -129,11 +127,25 @@
         }
     }
 
+    .comment-reply-form {
+        display: flex;
+        width: 70%;
+        margin-top: 0.5rem;
+        & > .textarea {
+            width: 100%;
+        }
+
+        & > button {
+            padding: 0 2rem;
+            border-left: 1px solid var(--border);
+        }
+    }
+
     .comment {
         padding-top: 0.75rem;
 
         & > .comment-meta {
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             color: var(--text-muted);
             & > button {
                 padding: 0;

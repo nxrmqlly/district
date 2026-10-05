@@ -42,6 +42,24 @@ footer {
     text-align: center;
 }
 
+.__input-group {
+    &:has(.__hidden-validator:invalid) .__form-visual-box {
+        border-color: var(--error);
+    }
+
+    &:has(.__hidden-validator:valid) .__form-visual-box {
+        border-color: var(--success);
+    }
+
+    & .__hidden-validator {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
 form {
     & > * {
         margin: 0;
@@ -56,12 +74,21 @@ form {
             border-color: var(--success);
         }
     }
+
+    & > input[type="submit"],
+    & > button[type="submit"] {
+        &:hover {
+            background-color: var(--surface-raised);
+            cursor: pointer;
+        }
+    }
 }
 
 input,
 textarea,
 button,
-select {
+select,
+.contenteditable-div {
     border-left: 0;
     border-right: 0;
     border-top: 0;
@@ -84,6 +111,12 @@ select {
     }
 }
 
+.contenteditable-div:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    cursor: text;
+}
+
 .form-error {
     color: var(--error);
 }
@@ -97,11 +130,6 @@ select {
 
     & > * {
         width: 100%;
-    }
-
-    & > button:hover {
-        background-color: var(--surface-raised);
-        cursor: pointer;
     }
 
     & > .details-parent {

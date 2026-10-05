@@ -23,11 +23,12 @@
             hx-post="/p/{{ .PostID }}/comment"
             hx-target="#comment-children-{{ .ID }}"
             hx-swap="beforeend"
+            x-data="{ content: '' }"
             x-show="replyOpen"
         >
             <input type="hidden" name="parent_id" value="{{ .ID }}" />
-            {{ .ID }}
-            <textarea name="body" id="body"></textarea>
+            {{ template "inline_textarea" (arr "body" "write a comment...")}}
+
             <!-- @click to close form after comment -->
             <button
                 class="comment-reply-submit"

@@ -88,9 +88,6 @@ func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 
 	ct := buildCommentTree(comments, sess)
 
-	log.Printf("comments: %+v", comments)
-	log.Printf("tree: %+v", ct)
-
 	ro.RenderPage(w, r, "post", post.Title, PostPageData{
 		GetPostRow: post,
 		Comments:   ct,
