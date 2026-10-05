@@ -3,6 +3,7 @@ package app
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,9 +13,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/nxrmqlly/district/app/httpx"
+	"github.com/nxrmqlly/district/auth"
 	"github.com/nxrmqlly/district/store"
 )
 
+// returns a HTML fragment.
 func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 	postID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
@@ -32,11 +35,12 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 	var parentID *int64
 
 	rawPID := strings.TrimSpace(r.Form.Get("parent_id"))
-
+	log.Printf("raw parent id: %q", rawPID)
 	// parent id is nil = top lvl comment
 	if rawPID != "" {
 		pid, err := strconv.ParseInt(rawPID, 10, 64)
 		if err != nil {
+			log.Printf("parse parent id: %v", err)
 			http.Error(w, "error parsing parent_id", http.StatusBadRequest)
 			return
 		}
@@ -51,7 +55,7 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	comment, err := ro.queries.CreateComment(r.Context(), store.CreateCommentParams{
+	c, err := ro.queries.CreateComment(r.Context(), store.CreateCommentParams{
 		PostID:   postID,
 		ParentID: parentID,
 		AuthorID: sess.UserID,
@@ -70,7 +74,27 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpx.WriteJSON(w, http.StatusCreated, comment)
+	if r.Header.Get("HX-Request") == "true" {
+		// render fragment if htmx wants to do its replacing
+		ro.RenderFragment(w, r, "comment", &CommentTree{
+			ID:             c.ID,
+			PostID:         c.PostID,
+			ParentID:       c.ParentID,
+			Body:           c.Body,
+			AuthorUsername: sess.Username,
+			AuthorID:       c.AuthorID,
+			CreatedAt:      c.CreatedAt,
+			DeletedAt:      c.DeletedAt,
+
+			Session: sess,
+
+			Children: nil, // a fresh comment will have no children anyways.
+		})
+		return
+	}
+
+	// if javascript is off or bot-user, redirect them
+	http.Redirect(w, r, fmt.Sprintf("/p/%d", postID), http.StatusSeeOther)
 }
 
 type CommentTree struct {
@@ -83,26 +107,26 @@ type CommentTree struct {
 	CreatedAt      time.Time
 	DeletedAt      *time.Time
 
+	Session *auth.AuthSession // convinience for ui
+
 	Children []*CommentTree
 }
 
-func translateCT(c store.GetCommentsByPostRow) *CommentTree {
-	return &CommentTree{
-		ID:             c.ID,
-		PostID:         c.PostID,
-		ParentID:       c.ParentID,
-		Body:           c.Body,
-		AuthorUsername: c.AuthorUsername,
-		AuthorID:       c.AuthorID,
-		CreatedAt:      c.CreatedAt,
-		DeletedAt:      c.DeletedAt,
-	}
-}
-
-func buildCommentTree(comments []store.GetCommentsByPostRow) []*CommentTree {
+func buildCommentTree(comments []store.GetCommentsByPostRow, sess *auth.AuthSession) []*CommentTree {
 	byID := make(map[int64]*CommentTree, len(comments))
 	for _, c := range comments {
-		byID[c.ID] = translateCT(c)
+		byID[c.ID] = &CommentTree{
+			ID:             c.ID,
+			PostID:         c.PostID,
+			ParentID:       c.ParentID,
+			Body:           c.Body,
+			AuthorUsername: c.AuthorUsername,
+			AuthorID:       c.AuthorID,
+			CreatedAt:      c.CreatedAt,
+			DeletedAt:      c.DeletedAt,
+
+			Session: sess,
+		}
 	}
 
 	var roots []*CommentTree

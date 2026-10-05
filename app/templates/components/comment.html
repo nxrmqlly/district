@@ -1,19 +1,47 @@
 {{ define "comment" }}
-<div class="comment">
-    <div class="comment-meta">
-        <span> {{ .AuthorUsername }} </span>
-        <span> | {{ timeago .CreatedAt }} </span>
-    </div>
+<article class="comment" id="comment-{{ .ID }}">
     <div class="comment-body">
         {{ if .DeletedAt }}
         <span class="deleted">[deleted]</span>
         {{ else }} {{ .Body }} {{ end }}
     </div>
+    <div class="comment-meta" x-data="{ replyOpen: false }">
+        <span> {{ .AuthorUsername }} </span>
+        <span> | {{ timeago .CreatedAt }} </span>
+        {{ if .Session }} |
+        <button
+            class="comment-reply-toggle"
+            @click="replyOpen = !replyOpen"
+            x-text="replyOpen ? 'cancel' : 'reply'"
+        >
+            reply
+        </button>
+        <form
+            class="comment-reply-form"
+            action="/p/{{ .PostID }}/comment"
+            method="post"
+            hx-post="/p/{{ .PostID }}/comment"
+            hx-target="#comment-children-{{ .ID }}"
+            hx-swap="beforeend"
+            x-show="replyOpen"
+        >
+            <input type="hidden" name="parent_id" value="{{ .ID }}" />
+            {{ .ID }}
+            <textarea name="body" id="body"></textarea>
+            <!-- @click to close form after comment -->
+            <button
+                class="comment-reply-submit"
+                type="submit"
+                @click="replyOpen = false"
+            >
+                reply
+            </button>
+        </form>
+        {{ end }}
+    </div>
 
-    {{ if .Children }}
-    <div class="comment-children">
+    <div class="comment-children" id="comment-children-{{ .ID }}">
         {{ range .Children }} {{ template "comment" . }} {{ end }}
     </div>
-    {{ end }}
-</div>
+</article>
 {{ end }}

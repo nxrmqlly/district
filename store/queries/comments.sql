@@ -3,7 +3,7 @@ SELECT c.*, u.username AS author_username
 FROM comments c
 JOIN users u ON u.id = c.author_id
 WHERE c.post_id = $1
-ORDER BY c.created_at ASC, c.id ASC;
+ORDER BY c.created_at DESC, c.id ASC;
 
 -- name: CreateComment :one
 INSERT INTO comments

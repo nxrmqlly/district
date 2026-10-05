@@ -58,7 +58,7 @@ SELECT c.id, c.post_id, c.parent_id, c.author_id, c.body, c.created_at, c.delete
 FROM comments c
 JOIN users u ON u.id = c.author_id
 WHERE c.post_id = $1
-ORDER BY c.created_at ASC, c.id ASC
+ORDER BY c.created_at DESC, c.id ASC
 `
 
 type GetCommentsByPostRow struct {

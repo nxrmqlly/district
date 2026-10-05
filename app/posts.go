@@ -62,6 +62,11 @@ type PostPageData struct {
 }
 
 func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
+	sess, ok := SessionFromContext(r.Context())
+	if !ok {
+		sess = nil
+	}
+
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		log.Println(err)
@@ -81,7 +86,7 @@ func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ct := buildCommentTree(comments)
+	ct := buildCommentTree(comments, sess)
 
 	log.Printf("comments: %+v", comments)
 	log.Printf("tree: %+v", ct)

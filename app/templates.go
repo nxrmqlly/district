@@ -25,8 +25,8 @@ type PageContext struct {
 	Data    any
 }
 
-// for the custom {{ render .X .X }} directive
-func renderDirective(root *template.Template) func(string, any) (template.HTML, error) {
+// for the custom {{ render .Name .Data }} directive
+func renderFunc(root *template.Template) func(string, any) (template.HTML, error) {
 	return func(name string, data any) (template.HTML, error) {
 		var buf bytes.Buffer
 		tmpl := root.Lookup(name)
@@ -41,7 +41,7 @@ func renderDirective(root *template.Template) func(string, any) (template.HTML, 
 	}
 }
 
-func TimeAgo(t time.Time) string {
+func timeagoFunc(t time.Time) string {
 	d := time.Since(t)
 	switch {
 	case d < time.Minute:
@@ -61,8 +61,8 @@ func parseTemplates() (*template.Template, error) {
 	root := template.New("")
 
 	root.Funcs(template.FuncMap{
-		"render":  renderDirective(root),
-		"timeago": TimeAgo,
+		"render":  renderFunc(root),
+		"timeago": timeagoFunc,
 	})
 
 	if err := fs.WalkDir(templatesFS, ".", func(path string, d fs.DirEntry, err error) error {
@@ -93,6 +93,13 @@ func (ro *Router) RenderPage(w http.ResponseWriter, r *http.Request, page, title
 		Session: sess,
 		Data:    data,
 	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (ro *Router) RenderFragment(w http.ResponseWriter, r *http.Request, component string, data any) {
+	if err := ro.templates.ExecuteTemplate(w, component, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
