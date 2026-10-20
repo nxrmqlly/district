@@ -17,3 +17,12 @@ OR EXISTS (
         AND post_id = $1
 )
 RETURNING *;
+
+-- name: DeleteComment :execrows
+UPDATE comments
+SET deleted_at = NOW(),
+    body = '[deleted]'
+WHERE id = $1
+    AND author_id = $2
+    AND deleted_at IS NULL
+RETURNING *;

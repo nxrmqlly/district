@@ -59,7 +59,7 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 		PostID:   postID,
 		ParentID: parentID,
 		AuthorID: sess.UserID,
-		Body:     body,
+		Body:     new(body),
 	})
 
 	if err != nil {
@@ -80,7 +80,7 @@ func (ro *Router) handleCommentCreate(w http.ResponseWriter, r *http.Request) {
 			ID:             c.ID,
 			PostID:         c.PostID,
 			ParentID:       c.ParentID,
-			Body:           c.Body,
+			Body:           *c.Body,
 			AuthorUsername: sess.Username,
 			AuthorID:       c.AuthorID,
 			CreatedAt:      c.CreatedAt,
@@ -119,7 +119,7 @@ func buildCommentTree(comments []store.GetCommentsByPostRow, sess *auth.AuthSess
 			ID:             c.ID,
 			PostID:         c.PostID,
 			ParentID:       c.ParentID,
-			Body:           c.Body,
+			Body:           *c.Body,
 			AuthorUsername: c.AuthorUsername,
 			AuthorID:       c.AuthorID,
 			CreatedAt:      c.CreatedAt,
@@ -151,4 +151,8 @@ func buildCommentTree(comments []store.GetCommentsByPostRow, sess *auth.AuthSess
 	}
 
 	return roots
+}
+
+func (ro *Router) handleCommentDelete(w http.ResponseWriter, r *http.Request) {
+	SessionFromContext(r.Context())
 }

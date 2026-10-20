@@ -22,9 +22,9 @@ WHERE p.id = $1
 type GetPostRow struct {
 	ID             int64
 	AuthorID       uuid.UUID
-	Title          string
-	EmbedUrl       string
-	Body           string
+	Title          *string
+	EmbedUrl       *string
+	Body           *string
 	CreatedAt      time.Time
 	DeletedAt      *time.Time
 	AuthorUsername string
@@ -57,9 +57,9 @@ ORDER BY p.created_at DESC
 type GetPostsByUsernameRow struct {
 	ID             int64
 	AuthorID       uuid.UUID
-	Title          string
-	EmbedUrl       string
-	Body           string
+	Title          *string
+	EmbedUrl       *string
+	Body           *string
 	CreatedAt      time.Time
 	DeletedAt      *time.Time
 	AuthorUsername string
@@ -103,9 +103,9 @@ RETURNING id, author_id, title, embed_url, body, created_at, deleted_at
 
 type NewPostParams struct {
 	AuthorID uuid.UUID
-	Title    string
-	EmbedUrl string
-	Body     string
+	Title    *string
+	EmbedUrl *string
+	Body     *string
 }
 
 func (q *Queries) NewPost(ctx context.Context, arg NewPostParams) (Post, error) {

@@ -15,7 +15,7 @@ type Comment struct {
 	PostID    int64
 	ParentID  *int64
 	AuthorID  uuid.UUID
-	Body      string
+	Body      *string
 	CreatedAt time.Time
 	DeletedAt *time.Time
 }
@@ -23,9 +23,9 @@ type Comment struct {
 type Post struct {
 	ID        int64
 	AuthorID  uuid.UUID
-	Title     string
-	EmbedUrl  string
-	Body      string
+	Title     *string
+	EmbedUrl  *string
+	Body      *string
 	CreatedAt time.Time
 	DeletedAt *time.Time
 }

@@ -30,7 +30,7 @@ type CreateCommentParams struct {
 	PostID   int64
 	ParentID *int64
 	AuthorID uuid.UUID
-	Body     string
+	Body     *string
 }
 
 func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
@@ -53,6 +53,29 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 	return i, err
 }
 
+const deleteComment = `-- name: DeleteComment :execrows
+UPDATE comments
+SET deleted_at = NOW(),
+    body = '[deleted]'
+WHERE id = $1
+    AND author_id = $2
+    AND deleted_at IS NULL
+RETURNING id, post_id, parent_id, author_id, body, created_at, deleted_at
+`
+
+type DeleteCommentParams struct {
+	ID       int64
+	AuthorID uuid.UUID
+}
+
+func (q *Queries) DeleteComment(ctx context.Context, arg DeleteCommentParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteComment, arg.ID, arg.AuthorID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const getCommentsByPost = `-- name: GetCommentsByPost :many
 SELECT c.id, c.post_id, c.parent_id, c.author_id, c.body, c.created_at, c.deleted_at, u.username AS author_username
 FROM comments c
@@ -66,7 +89,7 @@ type GetCommentsByPostRow struct {
 	PostID         int64
 	ParentID       *int64
 	AuthorID       uuid.UUID
-	Body           string
+	Body           *string
 	CreatedAt      time.Time
 	DeletedAt      *time.Time
 	AuthorUsername string

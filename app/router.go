@@ -63,6 +63,7 @@ func (ro *Router) routes() error {
 	ro.Handle("POST /submit", ro.handleSubmitCreate, ro.RequireAuth)
 	ro.Handle("GET  /p/{id}", ro.handlePostGet)
 	ro.Handle("POST /p/{id}/comment", ro.handleCommentCreate, ro.RequireAuth)
+	ro.Handle("POST /comments/{id}/delete", ro.handleCommentDelete, ro.RequireAuth)
 	ro.Handle("GET  /login", ro.handleLoginView)
 	ro.Handle("POST /login", ro.handleLogin)
 	ro.Handle("GET  /register", ro.handleRegisterView)

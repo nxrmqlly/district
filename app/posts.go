@@ -42,9 +42,9 @@ func (ro *Router) handleSubmitCreate(w http.ResponseWriter, r *http.Request) {
 
 	post, err := ro.queries.NewPost(r.Context(), store.NewPostParams{
 		AuthorID: sess.UserID,
-		Title:    title,
-		Body:     body,
-		EmbedUrl: "",
+		Title:    new(title),
+		Body:     new(body),
+		EmbedUrl: new(""),
 	})
 
 	if err != nil {
@@ -91,7 +91,7 @@ func (ro *Router) handlePostGet(w http.ResponseWriter, r *http.Request) {
 	log.Printf("comments: %+v", comments)
 	log.Printf("tree: %+v", ct)
 
-	ro.RenderPage(w, r, "post", post.Title, PostPageData{
+	ro.RenderPage(w, r, "post", *post.Title, PostPageData{
 		GetPostRow: post,
 		Comments:   ct,
 	})
