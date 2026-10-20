@@ -16,8 +16,20 @@
         >
             reply
         </button>
+        {{ end }}
+        <!-- -->
+        {{ if and (.Session) (eq .Session.UserID .AuthorID)}} |
         <form
-            class="comment-reply-form"
+            class="inline-form"
+            action="/comments/{{ .ID }}/delete"
+            method="post"
+        >
+            <button type="submit">delete</button>
+        </form>
+        {{ end }}
+
+        <form
+            class="new-comment-form comment-reply-form"
             action="/p/{{ .PostID }}/comment"
             method="post"
             hx-post="/p/{{ .PostID }}/comment"
@@ -26,8 +38,11 @@
             x-show="replyOpen"
         >
             <input type="hidden" name="parent_id" value="{{ .ID }}" />
-            {{ .ID }}
-            <textarea name="body" id="body"></textarea>
+            <textarea
+                name="body"
+                id="body"
+                placeholder="write a reply..."
+            ></textarea>
             <!-- @click to close form after comment -->
             <button
                 class="comment-reply-submit"
@@ -37,7 +52,6 @@
                 reply
             </button>
         </form>
-        {{ end }}
     </div>
 
     <div class="comment-children" id="comment-children-{{ .ID }}">

@@ -26,9 +26,13 @@
 
     {{ if .Session }}
     <form
+        class="new-comment-form"
         method="post"
         action="/p/{{ .Data.ID }}/comment"
-        class="new-comment-form"
+        method="post"
+        hx-post="/p/{{ .Data.ID }}/comment"
+        hx-target="#comments-inner-{{ .Data.ID }}"
+        hx-swap="beforeend"
     >
         <input type="hidden" name="parent_id" value="" />
         <textarea
@@ -40,9 +44,7 @@
         >
         {{- "" -}}
         </textarea>
-        <button hx-post="/p/{{ .Data.ID }}/comment" type="submit">
-            comment
-        </button>
+        <button type="submit">comment</button>
     </form>
     {{ else }}
     <p><a class="subtle-link" href="/login">log in</a> to leave a comment</p>
@@ -50,7 +52,7 @@
 
     <section class="comments">
         <h3>discussion</h3>
-        <div class="comments-inner">
+        <div class="comments-inner" id="comments-inner-{{ .Data.ID }}">
             {{ range .Data.Comments }} {{ template "comment" . }} {{ end }}
         </div>
     </section>
@@ -67,23 +69,25 @@
         color: var(--text-muted);
     }
 
-    .post-title {
-        background-color: var(--surface);
-        & > h2 {
-            margin-bottom: 0.5rem;
-            font-weight: 400;
-            font-family: var(--font);
+    .post {
+        & .post-title {
+            background-color: var(--surface);
+            & > h2 {
+                margin-bottom: 0.5rem;
+                font-weight: 400;
+                font-family: var(--font);
+            }
+
+            & > h2 > span {
+                color: var(--text-subtle);
+            }
         }
-        & > h2 > span {
-            color: var(--text-subtle);
+
+        & .post-body {
+            margin-top: 1rem;
+            white-space: pre-wrap;
         }
     }
-
-    .post-body {
-        margin-top: 1rem;
-        white-space: pre-wrap;
-    }
-
     .post-meta {
         font-size: 1rem;
         color: var(--text-muted);
@@ -95,23 +99,20 @@
         height: min-content;
 
         & > textarea {
-            height: 3rem;
+            resize: vertical;
+            height: 2.8rem;
             margin: 0;
             flex: 1;
             min-width: 0;
         }
 
         & > button {
+            font-size: 1rem;
             border-left: 1px solid var(--border);
             width: 20%;
             flex: 0 0 auto;
             min-width: 0;
             margin: 0;
-
-            &:hover {
-                background-color: var(--surface-raised);
-                cursor: pointer;
-            }
         }
     }
 
@@ -135,13 +136,16 @@
         & > .comment-meta {
             font-size: 0.75rem;
             color: var(--text-muted);
-            & > button {
+
+            & button {
                 padding: 0;
                 border: 0;
                 background-color: transparent;
                 margin: 0;
 
-                color: var(--text-subtle);
+                color: var(--text-muted);
+                text-decoration: underline;
+                cursor: pointer;
             }
         }
 
@@ -150,13 +154,16 @@
             padding-left: 1.5rem;
         }
 
-        & .comment-reply-toggle {
-            text-decoration: underline;
+        & .comment-reply-submit:hover {
             cursor: pointer;
         }
 
-        & .comment-reply-submit:hover {
-            cursor: pointer;
+        & .comment-reply-form {
+            width: 70%;
+        }
+
+        .inline-form {
+            display: inline;
         }
     }
 </style>
